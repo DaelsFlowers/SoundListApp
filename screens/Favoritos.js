@@ -58,33 +58,38 @@ const Favoritos = ({ navigation }) => {
             <Text style={styles.tittlelow}>Mis Eventos</Text>
             <View style={styles.divider} />
             {/* Evento */}
-            <View style={styles.eventContainer}>
-              <Image style={styles.eventImage} source={Pref} />
-              <View style={styles.eventDetailsContainer}>
-                <View style={styles.eventDetails}>
-                  <Text style={styles.eventTitle}>ERROR_NAME</Text>
-                </View>
-                <View style={styles.eventNumberContainer}>
-                  <Image style={styles.eventIcon} source={Pref} />
-                  <Text style={styles.eventNumber}>42</Text>
+            <TouchableOpacity onPress={() => navigation.navigate("Usuario")}>
+              <View style={styles.eventContainer}>
+                <Image style={styles.eventImage} source={Pref} />
+                <View style={styles.eventDetailsContainer}>
+                  <View style={styles.eventDetails}>
+                    <Text style={styles.eventTitle}>ERROR_NAME</Text>
+                  </View>
+                  <View style={styles.eventNumberContainer}>
+                    <Image style={styles.eventIcon} source={Pref} />
+                    <Text style={styles.eventNumber}>42</Text>
+                  </View>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
+
             <Text style={styles.tittlelow}>Favoritos</Text>
             <View style={styles.divider} />
 
-            <View style={styles.eventContainer}>
-              <Image style={styles.eventImage} source={Pref} />
-              <View style={styles.eventDetailsContainer}>
-                <View style={styles.eventDetails}>
-                  <Text style={styles.eventTitle}>ERROR_NAME</Text>
-                </View>
-                <View style={styles.eventNumberContainer}>
-                  <Image style={styles.eventIcon} source={Pref} />
-                  <Text style={styles.eventNumber}>42</Text>
+            <TouchableOpacity onPress={() => navigation.navigate("Administrador")}>
+              <View style={styles.eventContainer}>
+                <Image style={styles.eventImage} source={Pref} />
+                <View style={styles.eventDetailsContainer}>
+                  <View style={styles.eventDetails}>
+                    <Text style={styles.eventTitle}>ERROR_NAME</Text>
+                  </View>
+                  <View style={styles.eventNumberContainer}>
+                    <Image style={styles.eventIcon} source={Pref} />
+                    <Text style={styles.eventNumber}>42</Text>
+                  </View>
                 </View>
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
