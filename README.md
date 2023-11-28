@@ -24,7 +24,7 @@ SoundList es una aplicación móvil creada con React Native que te permite crear
 
 Para comenzar a utilizar SoundList, sigue estos pasos:
 
-1. **Clona el Repositorio**: `git clone https://github.com/TuUsuario/soundlist.git`
+1. **Clona el Repositorio**: `git clone https://github.com/DaelsFlowers/soundlistapp.git`
 
 2. **Configura tus Credenciales**:
    - Crea un archivo `.env` en la raíz del proyecto y agrega tus credenciales para servicios de streaming si es necesario.
@@ -47,9 +47,6 @@ Para comenzar a utilizar SoundList, sigue estos pasos:
 
 ## Equipo
 
-- [Nombre del Desarrollador 1](https://github.com/usuario1)
-- [Nombre del Desarrollador 2](https://github.com/usuario2)
-- [Nombre del Desarrollador 3](https://github.com/usuario3)
 
 ---
 
