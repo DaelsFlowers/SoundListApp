@@ -1,4 +1,3 @@
-// screens/Create.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -21,24 +20,12 @@ import "firebase/firestore";
 import btncrear from "../assets/btncrear.png";
 import update from "../assets/update.png";
 import fevent from "../assets/fevent.png";
-const SettingsAdmin = ({ navigation }) => {
+
+const SettingsAdmin = ({ route, navigation }) => {
   const auth = firebase.auth;
   const firestore = firebase.firestore;
   const user = firebase.auth().currentUser;
-
-  const [values, setValues] = useState({
-    codigo: "",
-    creador: "",
-    nombre: "",
-    nivel: "",
-    inicio: "",
-    fin: "",
-    visibilidad: "",
-  });
-
-  const handleChange = (text, eventName) => {
-    setValues((prev) => ({ ...prev, [eventName]: text }));
-  };
+  const eventId = route.params?.eventId || "";
 
   const [keyboardOffset, setKeyboardOffset] = useState(0);
 
@@ -63,71 +50,6 @@ const SettingsAdmin = ({ navigation }) => {
     };
   }, []);
 
-  function handleCreateEvent() {
-    const { codigo, creador, nombre, nivel, inicio, fin, visibilidad } = values;
-
-    if (codigo.trim() !== "") {
-      firestore()
-        .collection("Eventos")
-        .where("userid", "==", user.uid)
-        .get()
-        .then((snahp) => {
-          const cantidad = snahp.size;
-          if (cantidad < 3) {
-            firestore()
-              .collection("Eventos")
-              .doc()
-              .set({
-                id: (user.uid + cantidad).toString(),
-                codigo,
-                creador,
-                nombre,
-                nivel,
-                inicio,
-                fin,
-                visibilidad,
-              });
-            Alert.alert("Evento Creado");
-            loadData();
-          } else {
-            Alert.alert("YA CUENTA CON 3 EVENTOS");
-          }
-        })
-        .catch((error) => {
-          console.log("Error creating event: ", error);
-        });
-    } else {
-      Alert.alert("EL CÓDIGO NO PUEDE SER NULO");
-    }
-  }
-
-  async function loadData() {
-    try {
-      const querySnapshot = await firestore()
-        .collection("Eventos")
-        .where("userid", "==", user.uid)
-        .get();
-
-      if (!querySnapshot.empty) {
-        const EventosList = [];
-        querySnapshot.forEach((doc) => {
-          EventosList.push(doc.data());
-        });
-        setProductsList(EventosList);
-      }
-
-      const docRef = await firestore().collection("Users").doc(user.uid).get();
-      setnames(docRef.data().name);
-      setPhone(docRef.data().phone);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Image style={styles.topImage} source={Top} />
@@ -143,66 +65,23 @@ const SettingsAdmin = ({ navigation }) => {
 
             <View>
               <Text style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}>
-                CODIGO
+                CODIGO: {eventId.codigo}
               </Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="default"
-                onChangeText={(text) => handleChange(text, "codigo")}
-              />
-            </View>
-
-            <View>
               <Text style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}>
-                NOMBRE DEL EVENTO
+                NOMBRE DEL EVENTO: {eventId.nombre}
               </Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="default"
-                onChangeText={(text) => handleChange(text, "nombre")}
-              />
-            </View>
-
-            <View>
               <Text style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}>
-                NIVEL
+                NIVEL: {eventId.nivel}
               </Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="default"
-                onChangeText={(text) => handleChange(text, "nivel")}
-              />
-            </View>
-
-            <View style={styles.dateFormContainer}>
-              <View style={styles.dateForm}>
-                <Text style={styles.dateTitle}>INICIO</Text>
-                <TextInput
-                  style={styles.inputdate}
-                  keyboardType="default"
-                  onChangeText={(text) => handleChange(text, "inicio")}
-                />
-              </View>
-
-              <View style={styles.dateForm}>
-                <Text style={styles.dateTitle}>FIN</Text>
-                <TextInput
-                  style={styles.inputdate}
-                  keyboardType="default"
-                  onChangeText={(text) => handleChange(text, "fin")}
-                />
-              </View>
-            </View>
-
-            <View>
               <Text style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}>
-                VISIBILIDAD
+                INICIO: {eventId.inicio}
               </Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="default"
-                onChangeText={(text) => handleChange(text, "visibilidad")}
-              />
+              <Text style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}>
+                FIN: {eventId.fin}
+              </Text>
+              <Text style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}>
+                VISIBILIDAD: {eventId.visibilidad}
+              </Text>
             </View>
 
             <View
@@ -214,7 +93,7 @@ const SettingsAdmin = ({ navigation }) => {
               <TouchableOpacity onPress={() => firebase.auth().signOut()}>
                 <Image style={styles.btncrear} source={update} />
               </TouchableOpacity>
-              <TouchableOpacity onPress={handleCreateEvent}>
+              <TouchableOpacity >
                 <Image style={styles.btncrear} source={fevent} />
               </TouchableOpacity>
             </View>

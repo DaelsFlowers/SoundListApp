@@ -25,10 +25,9 @@ const Usuario = ({ navigation, route }) => {
   const [cancionInput, setCancionInput] = useState("");
   const [cancionesAhora, setCancionesAhora] = useState([]);
   const [cancionesLista, setCancionesLista] = useState([]);
-
   const user = firebase.auth().currentUser;
   const eventID = route.params.eventId;
-
+  const eventTitle = route.params.eventTitles;
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
       "keyboardDidShow",
@@ -61,6 +60,7 @@ const Usuario = ({ navigation, route }) => {
       const ahoraSnapshot = await eventRef
         .collection("canciones")
         .where("activa", "==", true)
+        .orderBy("votos", "desc")
         .get();
 
       const cancionesAhoraList = ahoraSnapshot.docs.map((doc) => ({
@@ -69,7 +69,11 @@ const Usuario = ({ navigation, route }) => {
       }));
       setCancionesAhora(cancionesAhoraList);
 
-      const listaSnapshot = await eventRef.collection("canciones").get();
+      const listaSnapshot = await eventRef
+        .collection("canciones")
+        .orderBy("votos", "desc")
+        .get();
+
       const cancionesListaList = listaSnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -99,6 +103,7 @@ const Usuario = ({ navigation, route }) => {
             nombre: cancionInput.trim(),
             activa: false,
             votos: 0,
+            votantes: [],
           });
 
           const cancionID = cancionDocRef.id;
@@ -121,13 +126,24 @@ const Usuario = ({ navigation, route }) => {
       const eventRef = firebase.firestore().collection("Events").doc(eventID);
       const cancionRef = eventRef.collection("canciones").doc(cancionID);
 
+      // Verificar si la persona ya votó por esta canción
       const cancionDoc = await cancionRef.get();
-      if (cancionDoc.exists) {
-        await cancionRef.update({
-          votos: firebase.firestore.FieldValue.increment(1),
-        });
 
-        loadCanciones();
+      if (cancionDoc.exists) {
+        const votantes = cancionDoc.data().votantes || [];
+
+        if (!votantes.includes(user.uid)) {
+          // Incrementar el contador de votos para la canción
+          await cancionRef.update({
+            votos: firebase.firestore.FieldValue.increment(1),
+            votantes: [...votantes, user.uid],
+          });
+
+          // Actualizar la lista de canciones después de votar
+          loadCanciones();
+        } else {
+          console.log("Ya has votado por esta canción.");
+        }
       } else {
         console.error("La canción no existe en la colección.");
       }
@@ -146,7 +162,7 @@ const Usuario = ({ navigation, route }) => {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.middleContainer}>
-          <Text style={styles.cardTitle}>TITULO DEL EVENTO</Text>
+          <Text style={styles.cardTitle}>{eventTitle}</Text>
           <View style={styles.cardContainer}>
             <Text style={styles.tittlelow}>AGREGAR CANCION</Text>
             <View>

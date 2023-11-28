@@ -156,6 +156,20 @@ export const styles = StyleSheet.create({
   tittlelow:{
     fontSize: 14,
     textAlign:"center"
-  }
-  
+  },
+  input: {
+    marginTop: height * 0.02, // Ajuste responsivo para el margen superior del input
+    marginHorizontal: width * 0.05, // Ajuste responsivo para el margen horizontal del input
+    height: height * 0.05, // Ajuste responsivo para la altura del input
+    borderWidth: 1,
+    borderColor: "#fff",
+    borderColor: "#000",
+  },
+  btnenviarimg: {
+    alignSelf: "center",
+    width: width / 2.5,
+    height: 40,
+    resizeMode: "stretch",
+    marginTop: 10,
+  },
 });

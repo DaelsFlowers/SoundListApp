@@ -5,14 +5,13 @@ import {
   SafeAreaView,
   Image,
   TouchableOpacity,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
   Keyboard,
 } from "react-native";
 import { styles } from "../assets/styles/AdministradorStyles";
 import { Ionicons } from "@expo/vector-icons";
+import firebase from "firebase/app";
+import "firebase/firestore";
 
 // Images
 import Top from "../assets/top.png";
@@ -24,8 +23,13 @@ import SettingsIco from "../assets/settingsico.png";
 import Upadm from "../assets/Upadm.png";
 import Delete from "../assets/delete.png";
 
-const Administrador = ({ navigation }) => {
+const Administrador = ({ route, navigation }) => {
   const [keyboardOffset, setKeyboardOffset] = useState(0);
+  const [cancionesAhora, setCancionesAhora] = useState([]);
+  const [cancionesLista, setCancionesLista] = useState([]);
+  const user = firebase.auth().currentUser;
+  const eventID = route.params.eventId; // Obtener el ID del evento desde las props de navegación
+  const eventTitle = route.params.eventTitles;
 
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener(
@@ -48,6 +52,97 @@ const Administrador = ({ navigation }) => {
     };
   }, []);
 
+  useEffect(() => {
+    loadCanciones();
+  }, []);
+
+  const loadCanciones = async () => {
+    try {
+      const eventRef = firebase.firestore().collection("Events").doc(eventID);
+
+      const ahoraSnapshot = await eventRef
+        .collection("canciones")
+        .where("activa", "==", true)
+        .orderBy("votos", "desc")
+        .get();
+
+      const cancionesAhoraList = ahoraSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCancionesAhora(cancionesAhoraList);
+
+      const listaSnapshot = await eventRef
+        .collection("canciones")
+        .orderBy("votos", "desc")
+        .get();
+
+      const cancionesListaList = listaSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Filtrar la canción activa si existe
+      const cancionesListaFiltrada = cancionesListaList.filter(
+        (cancion) =>
+          !cancionesAhoraList.find((c) => c.id === cancion.id && c.activa)
+      );
+
+      setCancionesLista(cancionesListaFiltrada);
+    } catch (error) {
+      console.error("Error loading canciones:", error);
+    }
+  };
+
+  const handleEliminarCancion = async (cancionID) => {
+    try {
+      const eventRef = firebase.firestore().collection("Events").doc(eventID);
+      const cancionRef = eventRef.collection("canciones").doc(cancionID);
+
+      // Eliminar la canción
+      await cancionRef.delete();
+
+      // Actualizar la lista de canciones AHORA después de eliminar
+      const updatedCancionesAhora = cancionesAhora.filter(
+        (cancion) => cancion.id !== cancionID
+      );
+      setCancionesAhora(updatedCancionesAhora);
+
+      // Eliminar la canción de la lista general
+      setCancionesLista(
+        cancionesLista.filter((cancion) => cancion.id !== cancionID)
+      );
+    } catch (error) {
+      console.error("Error deleting song:", error);
+    }
+  };
+
+  const handleToggleActiva = async (cancionID, activa) => {
+    try {
+      const eventRef = firebase.firestore().collection("Events").doc(eventID);
+      const cancionRef = eventRef.collection("canciones").doc(cancionID);
+
+      // Verificar si hay otra canción activa
+      const cancionesAhoraActivas = cancionesAhora.filter(
+        (cancion) => cancion.activa && cancion.id !== cancionID
+      );
+
+      if (activa || cancionesAhoraActivas.length === 0) {
+        // Cambiar el estado de activa de la canción
+        await cancionRef.update({
+          activa: !activa,
+        });
+
+        // Actualizar la lista de canciones después de cambiar el estado
+        loadCanciones();
+      } else {
+        console.log("Ya hay otra canción activa.");
+      }
+    } catch (error) {
+      console.error("Error toggling song activation:", error);
+    }
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <Image style={styles.topImage} source={Top} />
@@ -57,40 +152,62 @@ const Administrador = ({ navigation }) => {
         contentContainerStyle={{ paddingBottom: keyboardOffset }}
         keyboardShouldPersistTaps="handled"
       >
-        <TouchableOpacity style={styles.settingsimg} onPress={() => navigation.navigate("SettingsAdmin")}>
+        <TouchableOpacity
+          style={styles.settingsimg}
+          onPress={() =>
+            navigation.navigate("SettingsAdmin", { eventId: eventID })
+          }
+        >
           <Image style={styles.imgsetting} source={SettingsIco} />
         </TouchableOpacity>
+
         <View style={styles.middleContainer}>
-          <Text style={styles.cardTitle}>TITULO DEL EVENTO</Text>
+          <Text style={styles.cardTitle}>{eventTitle}</Text>
 
           <View style={styles.cardContainer}>
             <Text style={styles.tittleList}>AHORA</Text>
             <View style={styles.divider} />
-            <View style={styles.cardsong}>
-              <Text style={styles.eventTitleaux}>TITULO CANCION</Text>
+            {cancionesAhora.map((cancion) => (
+              <View key={cancion.id} style={styles.cardsong}>
+                <Text style={styles.eventTitleaux}>{cancion.nombre}</Text>
+                <TouchableOpacity
+                  style={styles.aux2}
+                  onPress={() => handleEliminarCancion(cancion.id)}
+                >
+                  <Image source={Delete} style={styles.imgaux3} />
+                </TouchableOpacity>
+              </View>
+            ))}
 
-              <TouchableOpacity style={styles.aux2}>
-                <Image source={Delete} style={styles.imgaux3} />
-              </TouchableOpacity>
-            </View>
             <Text style={styles.tittleList}>LISTA</Text>
             <View style={styles.divider} />
-            <View style={styles.cardsong}>
-              <View>
-                <Text style={styles.eventTitleaux}>TITULO CANCION</Text>
+            {cancionesLista.map((cancion) => (
+              <View key={cancion.id} style={styles.cardsong}>
+                <View>
+                  <Text style={styles.eventTitleaux}>{cancion.nombre}</Text>
+                </View>
+                <View style={styles.aux1}>
+                  <Text style={styles.eventTitleaux}>{cancion.votos}</Text>
+                </View>
+                <View style={styles.aux}>
+                  <TouchableOpacity
+                    onPress={() =>
+                      handleToggleActiva(
+                        cancion.id,
+                        cancionesAhora.find((c) => c.activa)?.id === cancion.id
+                      )
+                    }
+                  >
+                    <Image source={Upadm} style={styles.imgaux} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleEliminarCancion(cancion.id)}
+                  >
+                    <Image source={Delete} style={styles.imgaux} />
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.aux1}>
-                <Text style={styles.eventTitleaux}>5</Text>
-              </View>
-              <View style={styles.aux}>
-                <TouchableOpacity>
-                  <Image source={Upadm} style={styles.imgaux} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <Image source={Delete} style={styles.imgaux} />
-                </TouchableOpacity>
-              </View>
-            </View>
+            ))}
           </View>
         </View>
       </ScrollView>

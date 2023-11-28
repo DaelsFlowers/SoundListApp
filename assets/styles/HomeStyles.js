@@ -129,4 +129,12 @@ export const styles = StyleSheet.create({
     zIndex: 2,
     alignSelf: "center",
   },
+  settingsimg: {
+    position: "absolute",
+    margin: 10,
+  },
+  imgsetting: {
+    width: 40,
+    height: 40,
+  },
 });
