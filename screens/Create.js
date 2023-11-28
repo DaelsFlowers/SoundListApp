@@ -186,14 +186,7 @@ const Create = ({ navigation }) => {
           keyboardShouldPersistTaps="handled"
         >
           <View style={styles.middleContainer}>
-            <TouchableOpacity onPress={() => navigation.navigate("Create")}>
-              <View style={styles.cardContainer}>
-                <Text style={styles.cardTitle}>UNETE A UN EVENTO</Text>
-                <Text style={styles.tittlelow}>
-                  CREA TU EVENTO PERSONAL O PUBLICO
-                </Text>
-              </View>
-            </TouchableOpacity>
+            
 
             <View style={styles.cardContainer}>
               <Text style={styles.cardTitle}>CREAR UN EVENTO</Text>
@@ -274,7 +267,7 @@ const Create = ({ navigation }) => {
                   }
                 >
                   <Picker.Item label="Público" value="publico" />
-                  <Picker.Item label="Privado" value="privado" />
+                  
                 </Picker>
               </View>
 
@@ -295,7 +288,7 @@ const Create = ({ navigation }) => {
             style={styles.cornerButtonPress}
           />
           <TouchableOpacity
-            onPress={() => navigation.navigate("Join")}
+            onPress={() => navigation.navigate("Create")}
             style={styles.cornerButtonPressJoin}
           />
           <TouchableOpacity

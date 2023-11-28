@@ -158,7 +158,7 @@ const Favoritos = ({ navigation }) => {
             style={styles.cornerButtonPress}
           />
           <TouchableOpacity
-            onPress={() => navigation.navigate("Join")}
+            onPress={() => navigation.navigate("Create")}
             style={styles.cornerButtonPressJoin}
           />
           <Image style={styles.bottomBannerImage} source={FavoritosIMG} />

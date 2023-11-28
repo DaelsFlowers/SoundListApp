@@ -84,20 +84,7 @@ const Join = ({ navigation }) => {
             </View>
           </TouchableOpacity>
 
-          <View style={styles.cardContainer}>
-            <Text style={styles.cardTitle}>UNETE AL EVENTO</Text>
-            <Text style={styles.tittlelow}>
-              CODIGO DE ACCESO DEL EVENTO PARA INGRESAR
-            </Text>
-            <TextInput
-              style={styles.input}
-              keyboardType="default"
-              onChangeText={(text) => handleChange(text, "codigo")}
-            />
-            <TouchableOpacity onPress={handleJoinEvent}>
-              <Image style={styles.btnenviarimg} source={btnenviar} />
-            </TouchableOpacity>
-          </View>
+          
         </View>
       </ScrollView>
 

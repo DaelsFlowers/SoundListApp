@@ -152,14 +152,7 @@ const Administrador = ({ route, navigation }) => {
         contentContainerStyle={{ paddingBottom: keyboardOffset }}
         keyboardShouldPersistTaps="handled"
       >
-        <TouchableOpacity
-          style={styles.settingsimg}
-          onPress={() =>
-            navigation.navigate("SettingsAdmin", { eventId: eventID })
-          }
-        >
-          <Image style={styles.imgsetting} source={SettingsIco} />
-        </TouchableOpacity>
+        
 
         <View style={styles.middleContainer}>
           <Text style={styles.cardTitle}>{eventTitle}</Text>
@@ -219,7 +212,7 @@ const Administrador = ({ route, navigation }) => {
             style={styles.cornerButtonPress}
           />
           <TouchableOpacity
-            onPress={() => navigation.navigate("Join")}
+            onPress={() => navigation.navigate("Create")}
             style={styles.cornerButtonPressJoin}
           />
           <Image style={styles.bottomBannerImage} source={FavoritosIMG} />

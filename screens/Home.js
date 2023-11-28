@@ -19,7 +19,7 @@ import { useFocusEffect } from "@react-navigation/native";
 // Images
 import Top from "../assets/top.png";
 import Eventos from "../assets/eventos.png";
-import Pref from "../assets/pref.png";
+import Pref from "../assets/icopref.png";
 import logout from "../assets/logout.png";
 import imagen1 from "../assets/peq.png";
 import imagen2 from "../assets/med.png";
@@ -184,13 +184,7 @@ const Home = ({ navigation }) => {
           <Text style={styles.cardTitle}>EVENTOS</Text>
           <View style={styles.cardContainer}>
             {/* Buscador */}
-            <View style={styles.searchContainer}>
-              <Ionicons name="search" size={24} color="black" />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Buscar eventos..."
-              />
-            </View>
+            
 
             {/* Eventos públicos */}
             {events.map((event) => (
@@ -227,7 +221,7 @@ const Home = ({ navigation }) => {
             style={styles.cornerButtonPress}
           />
           <TouchableOpacity
-            onPress={() => navigation.navigate("Join")}
+            onPress={() => navigation.navigate("Create")}
             style={styles.cornerButtonPressJoin}
           />
           <Image style={styles.bottomBannerImage} source={Eventos} />
