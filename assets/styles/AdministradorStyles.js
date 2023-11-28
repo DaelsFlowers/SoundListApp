@@ -198,7 +198,7 @@ export const styles = StyleSheet.create({
     position: "absolute",
     alignItems: "center",
     right: 0,
-    height: 50,
+    height: 70,
     //backgroundColor:"red",
     marginRight: 40,
   },
@@ -232,4 +232,16 @@ export const styles = StyleSheet.create({
     width: 40,
     height: 40,
   },
+  aux2:{
+    position: "absolute",
+    right: 0,
+    margin: 5,
+    verticalAlign:"middle",
+    //backgroundColor:"red",
+  },
+  imgaux3:{
+    width: 30,
+    height: 30,
+    resizeMode: "stretch",
+  }
 });

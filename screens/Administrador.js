@@ -57,7 +57,7 @@ const Administrador = ({ navigation }) => {
         contentContainerStyle={{ paddingBottom: keyboardOffset }}
         keyboardShouldPersistTaps="handled"
       >
-        <TouchableOpacity style={styles.settingsimg}>
+        <TouchableOpacity style={styles.settingsimg} onPress={() => navigation.navigate("SettingsAdmin")}>
           <Image style={styles.imgsetting} source={SettingsIco} />
         </TouchableOpacity>
         <View style={styles.middleContainer}>
@@ -66,8 +66,12 @@ const Administrador = ({ navigation }) => {
           <View style={styles.cardContainer}>
             <Text style={styles.tittleList}>AHORA</Text>
             <View style={styles.divider} />
-            <View style={styles.eventContainer}>
-              <Text style={styles.eventTitle}>TITULO CANCION</Text>
+            <View style={styles.cardsong}>
+              <Text style={styles.eventTitleaux}>TITULO CANCION</Text>
+
+              <TouchableOpacity style={styles.aux2}>
+                <Image source={Delete} style={styles.imgaux3} />
+              </TouchableOpacity>
             </View>
             <Text style={styles.tittleList}>LISTA</Text>
             <View style={styles.divider} />
@@ -76,7 +80,7 @@ const Administrador = ({ navigation }) => {
                 <Text style={styles.eventTitleaux}>TITULO CANCION</Text>
               </View>
               <View style={styles.aux1}>
-                  <Text style={styles.eventTitleaux}>5</Text>
+                <Text style={styles.eventTitleaux}>5</Text>
               </View>
               <View style={styles.aux}>
                 <TouchableOpacity>
