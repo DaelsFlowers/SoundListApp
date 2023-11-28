@@ -211,7 +211,7 @@ const SettingsAdmin = ({ navigation }) => {
                 { flexDirection: "row", justifyContent: "space-between" },
               ]}
             >
-              <TouchableOpacity onPress={handleCreateEvent}>
+              <TouchableOpacity onPress={() => firebase.auth().signOut()}>
                 <Image style={styles.btncrear} source={update} />
               </TouchableOpacity>
               <TouchableOpacity onPress={handleCreateEvent}>

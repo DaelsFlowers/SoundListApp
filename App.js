@@ -4,7 +4,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import firebase from "firebase/app";
 import "firebase/auth";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-//Screens
+
+// Screens
 import LoginScreen from "./login/LoginScreen";
 import RegisterScreen from "./login/RegisterScreen";
 import Home from "./screens/Home";
@@ -33,78 +34,46 @@ function App() {
   };
 
   useEffect(() => {
-    !firebase.apps.length && firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
     const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
-      setIsLoggedIn(user !== null);
+      setIsLoggedIn(!!user);
     });
+
     return () => unsubscribe();
   }, []);
-  const screenOptions = {
-    headerShown: false,
-  };
+
+  const screenOptions = { headerShown: false };
+
+  const renderAuthenticatedScreens = () => (
+    <>
+      <Stack.Screen name="Home" component={Home} options={screenOptions} />
+      <Stack.Screen name="Favoritos" component={Favoritos} options={screenOptions} />
+      <Stack.Screen name="Join" component={Join} options={screenOptions} />
+      <Stack.Screen name="Create" component={Create} options={screenOptions} />
+      <Stack.Screen name="Usuario" component={Usuario} options={screenOptions} />
+      <Stack.Screen name="Administrador" component={Administrador} options={screenOptions} />
+      <Stack.Screen name="SettingsAdmin" component={SettingsAdmin} options={screenOptions} />
+      <Stack.Screen name="Perfil" component={Perfil} options={screenOptions} />
+    </>
+  );
+
+  const renderNonAuthenticatedScreens = () => (
+    <>
+      <Stack.Screen name="Login" component={LoginScreen} options={screenOptions} />
+      <Stack.Screen name="Register" component={RegisterScreen} options={screenOptions} />
+    </>
+  );
 
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        {isLoggedIn ? (
-          <>
-            <Stack.Screen
-              name="Home"
-              component={Home}
-              options={screenOptions}
-            />
-            <Stack.Screen
-              name="Favoritos"
-              component={Favoritos}
-              options={screenOptions}
-            />
-            <Stack.Screen
-              name="Join"
-              component={Join}
-              options={screenOptions}
-            />
-            <Stack.Screen
-              name="Create"
-              component={Create}
-              options={screenOptions}
-            />
-            <Stack.Screen
-              name="Usuario"
-              component={Usuario}
-              options={screenOptions}
-            />
-            <Stack.Screen
-              name="Administrador"
-              component={Administrador}
-              options={screenOptions}
-            />
-            <Stack.Screen
-              name="SettingsAdmin"
-              component={SettingsAdmin}
-              options={screenOptions}
-            />
-            <Stack.Screen
-              name="Perfil"
-              component={Perfil}
-              options={screenOptions}
-            />
-          </>
-        ) : (
-          <>
-            <Stack.Screen
-              name="Login"
-              component={LoginScreen}
-              options={screenOptions}
-            />
-            <Stack.Screen
-              name="Register"
-              component={RegisterScreen}
-              options={screenOptions}
-            />
-          </>
-        )}
+        {isLoggedIn ? renderAuthenticatedScreens() : renderNonAuthenticatedScreens()}
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
+
 export default App;

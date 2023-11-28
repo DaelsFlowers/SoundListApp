@@ -15,16 +15,18 @@ import { styles } from "../assets/styles/CreateStyles";
 import { Ionicons } from "@expo/vector-icons";
 import Top from "../assets/top.png";
 import bar from "../assets/join.png";
-import firebase from "firebase/app"
-import "firebase/auth"
-import "firebase/firestore"
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/firestore";
 import btncrear from "../assets/btncrear.png";
+import { Picker } from "@react-native-picker/picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 const Create = ({ navigation }) => {
   const auth = firebase.auth;
   const firestore = firebase.firestore;
   const user = firebase.auth().currentUser;
-  
+
   const [values, setValues] = useState({
     codigo: "",
     creador: "",
@@ -63,37 +65,40 @@ const Create = ({ navigation }) => {
   }, []);
 
   function handleCreateEvent() {
-    const { codigo, creador, nombre, nivel, inicio, fin, visibilidad } = values;
+    const { codigo, nombre, nivel, inicio, fin, visibilidad } = values;
 
     if (codigo.trim() !== "") {
       firestore()
-        .collection("Eventos")
-        .where("userid", "==", user.uid)
+        .collection("Events") // Cambiado de "Eventos" a "Events"
+        .where("creador", "==", user.uid) // Cambiado de "userid" a "creador"
         .get()
         .then((snahp) => {
           const cantidad = snahp.size;
           if (cantidad < 3) {
             firestore()
-              .collection("Eventos")
-              .doc()
-              .set({
-                id: (user.uid + cantidad).toString(),
+              .collection("Events")
+              .add({
                 codigo,
-                creador,
+                creador: user.uid,
                 nombre,
                 nivel,
                 inicio,
                 fin,
                 visibilidad,
+              })
+              .then(() => {
+                Alert.alert("Evento Creado");
+                loadData();
+              })
+              .catch((error) => {
+                console.log("Error creating event: ", error);
               });
-            Alert.alert("Evento Creado");
-            loadData();
           } else {
             Alert.alert("YA CUENTA CON 3 EVENTOS");
           }
         })
         .catch((error) => {
-          console.log("Error creating event: ", error);
+          console.log("Error checking existing events: ", error);
         });
     } else {
       Alert.alert("EL CÓDIGO NO PUEDE SER NULO");
@@ -150,9 +155,7 @@ const Create = ({ navigation }) => {
             <Text style={styles.cardTitle}>CREAR UN EVENTO</Text>
 
             <View>
-              <Text
-                style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}
-              >
+              <Text style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}>
                 CODIGO
               </Text>
               <TextInput
@@ -163,9 +166,7 @@ const Create = ({ navigation }) => {
             </View>
 
             <View>
-              <Text
-                style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}
-              >
+              <Text style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}>
                 NOMBRE DEL EVENTO
               </Text>
               <TextInput
@@ -176,49 +177,64 @@ const Create = ({ navigation }) => {
             </View>
 
             <View>
-              <Text
-                style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}
-              >
+              <Text style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}>
                 NIVEL
               </Text>
-              <TextInput
+              <Picker
                 style={styles.input}
-                keyboardType="default"
-                onChangeText={(text) => handleChange(text, "nivel")}
-              />
+                selectedValue={values.nivel}
+                onValueChange={(itemValue) => handleChange(itemValue, "nivel")}
+              >
+                <Picker.Item label="Pequeña" value="pequena" />
+                <Picker.Item label="Mediana" value="mediana" />
+                <Picker.Item label="Grande" value="grande" />
+              </Picker>
             </View>
 
             <View style={styles.dateFormContainer}>
               <View style={styles.dateForm}>
                 <Text style={styles.dateTitle}>INICIO</Text>
-                <TextInput
+                <DateTimePicker
                   style={styles.inputdate}
-                  keyboardType="default"
-                  onChangeText={(text) => handleChange(text, "inicio")}
+                  value={new Date(values.inicio)}
+                  mode="date"
+                  display="default"
+                  onChange={(event, selectedDate) => {
+                    const currentDate = selectedDate || new Date();
+                    handleChange(currentDate.toISOString(), "inicio");
+                  }}
                 />
               </View>
 
               <View style={styles.dateForm}>
                 <Text style={styles.dateTitle}>FIN</Text>
-                <TextInput
+                <DateTimePicker
                   style={styles.inputdate}
-                  keyboardType="default"
-                  onChangeText={(text) => handleChange(text, "fin")}
+                  value={new Date(values.fin)}
+                  mode="date"
+                  display="default"
+                  onChange={(event, selectedDate) => {
+                    const currentDate = selectedDate || new Date();
+                    handleChange(currentDate.toISOString(), "fin");
+                  }}
                 />
               </View>
             </View>
 
             <View>
-              <Text
-                style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}
-              >
+              <Text style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}>
                 VISIBILIDAD
               </Text>
-              <TextInput
+              <Picker
                 style={styles.input}
-                keyboardType="default"
-                onChangeText={(text) => handleChange(text, "visibilidad")}
-              />
+                selectedValue={values.visibilidad}
+                onValueChange={(itemValue) =>
+                  handleChange(itemValue, "visibilidad")
+                }
+              >
+                <Picker.Item label="Público" value="publico" />
+                <Picker.Item label="Privado" value="privado" />
+              </Picker>
             </View>
 
             <View style={styles.btncontent}>

@@ -65,7 +65,7 @@ const Join = ({ navigation }) => {
           <View style={styles.cardContainer}>
             <Text style={styles.cardTitle}>UNETE AL EVENTO</Text>
             <Text style={styles.tittlelow}>
-              ESCANEA EL QR O EL CODIGO DE ACCESO DEL EVENTO PARA INGREAR
+              CODIGO DE ACCESO DEL EVENTO PARA INGREAR
             </Text>
           </View>
         </View>

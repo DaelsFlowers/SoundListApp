@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,13 +9,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  TouchableOpacity,
+  Keyboard,
 } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
 import { styles } from "../assets/styles/LoginStyles.js";
-import { TouchableOpacity } from "react-native";
 
-// Images
+// Imágenes
 import TopLogin from "../assets/topLogin.png";
 import ButtonLogin from "../assets/buttonLogin.png";
 import Show from "../assets/show.png";
@@ -26,6 +27,8 @@ export default function LoginScreen({ navigation }) {
     email: "",
     password: "",
   });
+
+  const [showBottomContainer, setShowBottomContainer] = useState(true);
 
   const handleChange = (text, eventName) => {
     setValues((prev) => ({ ...prev, [eventName]: text }));
@@ -45,6 +48,27 @@ export default function LoginScreen({ navigation }) {
 
   const [showPassword, setShowPassword] = useState(false);
 
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setShowBottomContainer(false);
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setShowBottomContainer(true);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -53,13 +77,16 @@ export default function LoginScreen({ navigation }) {
       >
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
-          style={{ flex: 1 }}
+          style={{ flex: 1, flexGrow: 1 }}
+          keyboardShouldPersistTaps="handled"
         >
+          {/* Contenedor Superior */}
           <View style={styles.topContainer}>
             <View style={styles.topContainerAux}></View>
             <Image style={styles.bannerImage} source={TopLogin} />
           </View>
 
+          {/* Contenedor Medio */}
           <View style={styles.middleContainer}>
             <View style={styles.cardContainer}>
               <Text
@@ -70,7 +97,7 @@ export default function LoginScreen({ navigation }) {
                   fontWeight: "bold",
                 }}
               >
-                INICIAR SESION
+                INICIAR SESIÓN
               </Text>
 
               <Text style={{ marginLeft: 30, fontSize: 16, marginTop: 50 }}>
@@ -79,7 +106,6 @@ export default function LoginScreen({ navigation }) {
               <TextInput
                 style={styles.input}
                 keyboardType="default"
-                placeholder="Ingresa tu correo"
                 onChangeText={(text) => handleChange(text, "email")}
               />
 
@@ -90,7 +116,6 @@ export default function LoginScreen({ navigation }) {
                 <TextInput
                   style={styles.input}
                   keyboardType="default"
-                  placeholder="Ingresa tu contraseña"
                   onChangeText={(text) => handleChange(text, "password")}
                   secureTextEntry={!showPassword}
                 />
@@ -113,16 +138,16 @@ export default function LoginScreen({ navigation }) {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Bottom Container */}
-      <View style={styles.bottomContainer}>
-        <View style={styles.cornerButton}>
+      {/* Contenedor Inferior */}
+      {showBottomContainer && (
+        <View style={styles.bottomContainer}>
           <TouchableOpacity
             onPress={() => navigation.navigate("Register")}
             style={styles.cornerButtonPress}
           />
           <Image style={styles.bottomBannerImage} source={ButtonLogin} />
         </View>
-      </View>
+      )}
     </SafeAreaView>
   );
 }

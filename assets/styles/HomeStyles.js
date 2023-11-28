@@ -1,3 +1,4 @@
+// HomeStyles.js
 import { StyleSheet, Dimensions } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 const { width, height } = Dimensions.get("window");
@@ -33,9 +34,6 @@ export const styles = StyleSheet.create({
     marginBottom: 10,
     textAlign: "center",
   },
-  cardText: {
-    fontSize: 16,
-  },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -58,7 +56,7 @@ export const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 5,
     borderWidth: 0.8,
-    borderColor:"#00000055",
+    borderColor: "#00000055",
     backgroundColor: "#CD7AD2",
     shadowColor: "#000",
     shadowOffset: {
@@ -68,7 +66,7 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
-  },  
+  },
   eventImage: {
     resizeMode: "stretch",
     width: 65,
@@ -83,7 +81,6 @@ export const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 10,
     marginTop: 15,
-    //backgroundColor:"#ff0000"
   },
   eventTitle: {
     fontSize: 16,
@@ -99,10 +96,6 @@ export const styles = StyleSheet.create({
   eventNumberContainer: {
     flexDirection: "column",
     alignItems: "center",
-  },
-  eventosButton: {
-    alignItems: "center",
-    marginTop: height * 0.02,
   },
   bottomContainer: {
     height: height * 0.1,
@@ -134,9 +127,6 @@ export const styles = StyleSheet.create({
     bottom: 0,
     position: "absolute",
     zIndex: 2,
-    //backgroundColor: "#00fff0",
     alignSelf: "center",
   },
-  
-  
 });

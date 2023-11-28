@@ -59,41 +59,38 @@ export const styles = StyleSheet.create({
     backgroundColor: "#D481C7",
   },
   bottomContainer: {
-    height: height * 0.1,
+    position: "absolute",
+    bottom: 0,
+  
+    //backgroundColor:"red",
   },
   bottomBannerImage: {
-    width: "100%",
-    height: height * 0.1,
-    resizeMode: "stretch",
+    width: width,
+    height: 80,
+    resizeMode: "stretch", // Use "cover" to maintain aspect ratio and fill the container
   },
   scrollContainer: {
     flexGrow: 1,
   },
-  cornerButton: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: "flex-end",
-    justifyContent: "flex-start",
-  },
+  
   cornerButtonPress: {
-    width: width/2,
-    height: 100,
-    //backgroundColor:"#ff000070",
-    position:"absolute",
-    zIndex:1
+    width: width / 2,
+    height: height * 0.1,
+    position: "absolute",
+    zIndex: 1,
+    right:0,
+    bottom:0,
+    //backgroundColor:"red"
   },
   passwordShowButtonContainer: {
     flexDirection: "row",
     alignItems: "center",
-    position:"absolute",
+    position: "absolute",
     right: 0,
     bottom: 0,
   },
-  passwordShowImage:{
-    width:50,
-    resizeMode:"stretch"
-  }
+  passwordShowImage: {
+    width: 50,
+    resizeMode: "stretch",
+  },
 });

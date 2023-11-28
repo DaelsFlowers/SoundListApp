@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,13 +9,14 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  TouchableOpacity,
+  Keyboard,
 } from "react-native";
 import firebase from "firebase/app";
 import "firebase/auth";
 import { styles } from "../assets/styles/RegisterStyles.js";
-import { TouchableOpacity } from "react-native";
 
-// Images
+// Imágenes
 import TopLogin from "../assets/topLogin.png";
 import ButtonRegister from "../assets/buttonRegister.png";
 import Show from "../assets/show.png";
@@ -32,14 +33,15 @@ export default function RegisterScreen({ navigation }) {
     password2: "",
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showBottomContainer, setShowBottomContainer] = useState(true);
+
   const handleChange = (text, eventName) => {
     setValues((prev) => ({ ...prev, [eventName]: text }));
   };
 
-  const [showPassword, setShowPassword] = useState(false);
-
   function Register() {
-    const { name, email, password, password2, phone } = values;
+    const { name, email, password, password2 } = values;
 
     if (password == password2) {
       auth()
@@ -51,7 +53,6 @@ export default function RegisterScreen({ navigation }) {
             email,
             password,
             password2,
-            phone,
           });
           alert("CUENTA CREADA");
         })
@@ -63,6 +64,28 @@ export default function RegisterScreen({ navigation }) {
       alert("LAS CONTRASEÑAS SON DIFERENTES");
     }
   }
+
+  useEffect(() => {
+    const keyboardDidShowListener = Keyboard.addListener(
+      "keyboardDidShow",
+      () => {
+        setShowBottomContainer(false);
+      }
+    );
+
+    const keyboardDidHideListener = Keyboard.addListener(
+      "keyboardDidHide",
+      () => {
+        setShowBottomContainer(true);
+      }
+    );
+
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
@@ -72,12 +95,16 @@ export default function RegisterScreen({ navigation }) {
         <ScrollView
           contentContainerStyle={styles.scrollContainer}
           style={{ flex: 1 }}
+          keyboardShouldPersistTaps="handled"
+          onPress={() => Keyboard.dismiss()}
         >
+          {/* Contenedor Superior */}
           <View style={styles.topContainer}>
             <View style={styles.topContainerAux}></View>
             <Image style={styles.bannerImage} source={TopLogin} />
           </View>
 
+          {/* Contenedor Medio */}
           <View style={styles.middleContainer}>
             <View style={styles.cardContainer}>
               <Text
@@ -88,7 +115,7 @@ export default function RegisterScreen({ navigation }) {
                   fontWeight: "bold",
                 }}
               >
-                INICIAR SESION
+                REGISTRAR CUENTA
               </Text>
 
               <Text style={{ marginLeft: 30, fontSize: 14, marginTop: 10 }}>
@@ -131,7 +158,7 @@ export default function RegisterScreen({ navigation }) {
               </View>
 
               <Text style={{ marginLeft: 30, fontSize: 14, marginTop: 10 }}>
-                CONTRASEÑA
+                CONFIRMAR CONTRASEÑA
               </Text>
               <TextInput
                 style={styles.input}
@@ -141,27 +168,25 @@ export default function RegisterScreen({ navigation }) {
               />
 
               <View style={[styles.button, styles.loginButton]}>
-                <Button
-                  title="INGRESAR"
-                  color="#D481C7"
-                  onPress={() => Register()}
-                />
+                <Button title="REGISTRAR" color="#D481C7" onPress={Register} />
               </View>
             </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {/* Bottom Container */}
-      <View style={styles.bottomContainer}>
-        <View style={styles.cornerButton}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate("Login")}
-            style={styles.cornerButtonPress}
-          />
-          <Image style={styles.bottomBannerImage} source={ButtonRegister} />
+      {/* Contenedor Inferior */}
+      {showBottomContainer && (
+        <View style={styles.bottomContainer}>
+          <View style={styles.cornerButton}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Login")}
+              style={styles.cornerButtonPress}
+            />
+            <Image style={styles.bottomBannerImage} source={ButtonRegister} />
+          </View>
         </View>
-      </View>
+      )}
     </SafeAreaView>
   );
 }
