@@ -1,6 +1,6 @@
 # SoundList: Tu Plataforma de Listas de Reproducción con Votación
 
-![Logo de SoundList](assets/SoundList.png)
+![Logo de SoundList](assets/topLogin.png)
 
 SoundList es una aplicación móvil creada con React Native que te permite crear eventos para compartir y votar listas de reproducción de forma sencilla y divertida. Ya sea que desees organizar una fiesta, una reunión con amigos o simplemente compartir tus canciones favoritas, SoundList tiene todo lo que necesitas.
 
