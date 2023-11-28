@@ -1,4 +1,3 @@
-// screens/Create.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -10,9 +9,10 @@ import {
   Keyboard,
   TextInput,
   Alert,
+  Platform,
+  KeyboardAvoidingView,
 } from "react-native";
 import { styles } from "../assets/styles/CreateStyles";
-import { Ionicons } from "@expo/vector-icons";
 import Top from "../assets/top.png";
 import bar from "../assets/join.png";
 import firebase from "firebase/app";
@@ -20,10 +20,9 @@ import "firebase/auth";
 import "firebase/firestore";
 import btncrear from "../assets/btncrear.png";
 import { Picker } from "@react-native-picker/picker";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { addDays, addWeeks, format } from "date-fns";
 
 const Create = ({ navigation }) => {
-  const auth = firebase.auth;
   const firestore = firebase.firestore;
   const user = firebase.auth().currentUser;
 
@@ -32,9 +31,8 @@ const Create = ({ navigation }) => {
     creador: "",
     nombre: "",
     nivel: "",
-    inicio: "",
-    fin: "",
-    visibilidad: "",
+    duracion: "1 día", // Valor predeterminado
+    visibilidad: "publico",
   });
 
   const handleChange = (text, eventName) => {
@@ -65,16 +63,33 @@ const Create = ({ navigation }) => {
   }, []);
 
   function handleCreateEvent() {
-    const { codigo, nombre, nivel, inicio, fin, visibilidad } = values;
-
-    if (codigo.trim() !== "") {
+    const { codigo, nombre, nivel, duracion, visibilidad } = values;
+  
+    if (codigo.trim() !== "" && nombre.trim() !== "") {
       firestore()
-        .collection("Events") // Cambiado de "Eventos" a "Events"
-        .where("creador", "==", user.uid) // Cambiado de "userid" a "creador"
+        .collection("Events")
+        .where("creador", "==", user.uid)
         .get()
-        .then((snahp) => {
-          const cantidad = snahp.size;
+        .then((snapshot) => {
+          const cantidad = snapshot.size;
           if (cantidad < 3) {
+            const currentDate = new Date();
+            let endDate;
+  
+            switch (duracion) {
+              case "1 día":
+                endDate = addDays(currentDate, 1);
+                break;
+              case "3 días":
+                endDate = addDays(currentDate, 3);
+                break;
+              case "1 semana":
+                endDate = addWeeks(currentDate, 1);
+                break;
+              default:
+                endDate = addDays(currentDate, 1);
+            }
+  
             firestore()
               .collection("Events")
               .add({
@@ -82,51 +97,76 @@ const Create = ({ navigation }) => {
                 creador: user.uid,
                 nombre,
                 nivel,
-                inicio,
-                fin,
+                inicio: format(currentDate, "yyyy-MM-dd"),
+                fin: format(endDate, "yyyy-MM-dd"),
                 visibilidad,
               })
               .then(() => {
-                Alert.alert("Evento Creado");
+                Alert.alert("Éxito", "Evento creado exitosamente.");
                 loadData();
+                // Limpiar el formulario
+                setValues({
+                  codigo: "",
+                  creador: "",
+                  nombre: "",
+                  nivel: "",
+                  duracion: "1 día",
+                  visibilidad: "publico",
+                });
+                // Ocultar el teclado si está activo
+                Keyboard.dismiss();
               })
               .catch((error) => {
+                Alert.alert("Error", "Error al crear el evento.");
                 console.log("Error creating event: ", error);
               });
           } else {
-            Alert.alert("YA CUENTA CON 3 EVENTOS");
+            Alert.alert("Error", "Ya cuenta con 3 eventos.");
           }
         })
         .catch((error) => {
+          Alert.alert("Error", "Error al verificar eventos existentes.");
           console.log("Error checking existing events: ", error);
         });
     } else {
-      Alert.alert("EL CÓDIGO NO PUEDE SER NULO");
+      Alert.alert("Error", "El código y el nombre no pueden ser nulos.");
     }
   }
+  
 
   async function loadData() {
     try {
       const querySnapshot = await firestore()
-        .collection("Eventos")
-        .where("userid", "==", user.uid)
+        .collection("Events")
+        .where("creador", "==", user.uid)
         .get();
-
+  
       if (!querySnapshot.empty) {
-        const EventosList = [];
+        const eventosList = [];
         querySnapshot.forEach((doc) => {
-          EventosList.push(doc.data());
+          eventosList.push(doc.data());
         });
-        setProductsList(EventosList);
+  
+        // Asegúrate de incluir todas las propiedades en el estado
+        const updatedValues = {
+          ...values,
+          eventosList, // o cualquier otra propiedad que necesites
+        };
+  
+        setValues(updatedValues);
       }
-
+  
       const docRef = await firestore().collection("Users").doc(user.uid).get();
-      setnames(docRef.data().name);
-      setPhone(docRef.data().phone);
+      setValues((prev) => ({
+        ...prev,
+        names: docRef.data().name,
+        phone: docRef.data().phone,
+      }));
     } catch (error) {
       console.log(error);
     }
   }
+  
 
   useEffect(() => {
     loadData();
@@ -134,117 +174,119 @@ const Create = ({ navigation }) => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <Image style={styles.topImage} source={Top} />
-
-      <ScrollView
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : null}
         style={{ flex: 1 }}
-        contentContainerStyle={{ paddingBottom: keyboardOffset }}
-        keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.middleContainer}>
-          <TouchableOpacity onPress={() => navigation.navigate("Create")}>
+        <Image style={styles.topImage} source={Top} />
+
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ paddingBottom: keyboardOffset }}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.middleContainer}>
+            <TouchableOpacity onPress={() => navigation.navigate("Create")}>
+              <View style={styles.cardContainer}>
+                <Text style={styles.cardTitle}>UNETE A UN EVENTO</Text>
+                <Text style={styles.tittlelow}>
+                  CREA TU EVENTO PERSONAL O PUBLICO
+                </Text>
+              </View>
+            </TouchableOpacity>
+
             <View style={styles.cardContainer}>
-              <Text style={styles.cardTitle}>UNETE A UN EVENTO</Text>
-              <Text style={styles.tittlelow}>
-                CREA TU EVENTO PERSONAL O PUBLICO
-              </Text>
-            </View>
-          </TouchableOpacity>
+              <Text style={styles.cardTitle}>CREAR UN EVENTO</Text>
 
-          <View style={styles.cardContainer}>
-            <Text style={styles.cardTitle}>CREAR UN EVENTO</Text>
-
-            <View>
-              <Text style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}>
-                CODIGO
-              </Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="default"
-                onChangeText={(text) => handleChange(text, "codigo")}
-              />
-            </View>
-
-            <View>
-              <Text style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}>
-                NOMBRE DEL EVENTO
-              </Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="default"
-                onChangeText={(text) => handleChange(text, "nombre")}
-              />
-            </View>
-
-            <View>
-              <Text style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}>
-                NIVEL
-              </Text>
-              <Picker
-                style={styles.input}
-                selectedValue={values.nivel}
-                onValueChange={(itemValue) => handleChange(itemValue, "nivel")}
-              >
-                <Picker.Item label="Pequeña" value="pequena" />
-                <Picker.Item label="Mediana" value="mediana" />
-                <Picker.Item label="Grande" value="grande" />
-              </Picker>
-            </View>
-
-            <View style={styles.dateFormContainer}>
-              <View style={styles.dateForm}>
-                <Text style={styles.dateTitle}>INICIO</Text>
-                <DateTimePicker
-                  style={styles.inputdate}
-                  value={new Date(values.inicio)}
-                  mode="date"
-                  display="default"
-                  onChange={(event, selectedDate) => {
-                    const currentDate = selectedDate || new Date();
-                    handleChange(currentDate.toISOString(), "inicio");
-                  }}
+              <View>
+                <Text
+                  style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}
+                >
+                  CODIGO
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="default"
+                  onChangeText={(text) => handleChange(text, "codigo")}
                 />
               </View>
 
-              <View style={styles.dateForm}>
-                <Text style={styles.dateTitle}>FIN</Text>
-                <DateTimePicker
-                  style={styles.inputdate}
-                  value={new Date(values.fin)}
-                  mode="date"
-                  display="default"
-                  onChange={(event, selectedDate) => {
-                    const currentDate = selectedDate || new Date();
-                    handleChange(currentDate.toISOString(), "fin");
-                  }}
+              <View>
+                <Text
+                  style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}
+                >
+                  NOMBRE DEL EVENTO
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  keyboardType="default"
+                  onChangeText={(text) => handleChange(text, "nombre")}
                 />
               </View>
-            </View>
 
-            <View>
-              <Text style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}>
-                VISIBILIDAD
-              </Text>
-              <Picker
-                style={styles.input}
-                selectedValue={values.visibilidad}
-                onValueChange={(itemValue) =>
-                  handleChange(itemValue, "visibilidad")
-                }
-              >
-                <Picker.Item label="Público" value="publico" />
-                <Picker.Item label="Privado" value="privado" />
-              </Picker>
-            </View>
+              <View>
+                <Text
+                  style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}
+                >
+                  NIVEL
+                </Text>
+                <Picker
+                  style={styles.input}
+                  selectedValue={values.nivel}
+                  onValueChange={(itemValue) => handleChange(itemValue, "nivel")}
+                >
+                  <Picker.Item label="Pequeña" value="pequena" />
+                  <Picker.Item label="Mediana" value="mediana" />
+                  <Picker.Item label="Grande" value="grande" />
+                </Picker>
+              </View>
 
-            <View style={styles.btncontent}>
-              <TouchableOpacity onPress={handleCreateEvent}>
-                <Image style={styles.btncrear} source={btncrear} />
-              </TouchableOpacity>
+              <View>
+                <Text
+                  style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}
+                >
+                  DURACIÓN
+                </Text>
+                <Picker
+                  style={styles.input}
+                  selectedValue={values.duracion}
+                  onValueChange={(itemValue) =>
+                    handleChange(itemValue, "duracion")
+                  }
+                >
+                  <Picker.Item label="1 día" value="1 día" />
+                  <Picker.Item label="3 días" value="3 días" />
+                  <Picker.Item label="1 semana" value="1 semana" />
+                </Picker>
+              </View>
+
+              <View>
+                <Text
+                  style={{ fontSize: 14, marginTop: 5, textAlign: "center" }}
+                >
+                  VISIBILIDAD
+                </Text>
+                <Picker
+                  style={styles.input}
+                  selectedValue={values.visibilidad}
+                  onValueChange={(itemValue) =>
+                    handleChange(itemValue, "visibilidad")
+                  }
+                >
+                  <Picker.Item label="Público" value="publico" />
+                  <Picker.Item label="Privado" value="privado" />
+                </Picker>
+              </View>
+
+              <View style={styles.btncontent}>
+                <TouchableOpacity onPress={handleCreateEvent}>
+                  <Image style={styles.btncrear} source={btncrear} />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </KeyboardAvoidingView>
 
       <View style={styles.bottomContainer}>
         <View style={styles.cornerButton}>
